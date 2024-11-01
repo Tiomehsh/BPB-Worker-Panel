@@ -4267,11 +4267,11 @@ var worker_default = {
             }
             const loginAuth = await Authenticate(request, env);
             if (loginAuth)
-              return Response.redirect(`${url.origin}/panel`, 302);
+              return Response.redirect(`${url.origin}/panel`， 302);
             let secretKey = await env.bpb.get("secretKey");
             if (!secretKey) {
               secretKey = generateSecretKey();
-              await env.bpb.put("secretKey", secretKey);
+              await env.bpb.put("secretKey"， secretKey);
             }
             if (request.method === "POST") {
               const password = await request.text();
@@ -4279,66 +4279,67 @@ var worker_default = {
               if (password === savedPass) {
                 const jwtToken = await generateJWTToken(secretKey);
                 const cookieHeader = `jwtToken=${jwtToken}; HttpOnly; Secure; Max-Age=${7 * 24 * 60 * 60}; Path=/; SameSite=Strict`;
-                return new Response("Success", {
-                  status: 200,
+                return new Response("Success"， {
+                  status: 200，
                   headers: {
-                    "Set-Cookie": cookieHeader,
+                    "Set-Cookie": cookieHeader，
                     "Content-Type": "text/plain"
                   }
                 });
               } else {
-                return new Response("Method Not Allowed", { status: 405 });
+                return new Response("Method Not Allowed"， { status: 405 });
               }
             }
             const loginPage = renderLoginPage();
-            return new Response(loginPage, {
-              status: 200,
+            return new Response(loginPage， {
+              status: 200，
               headers: {
-                "Content-Type": "text/html",
+                "Content-Type": "text/html"，
                 "Access-Control-Allow-Origin": url.origin,
-                "Access-Control-Allow-Methods": "GET, POST",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                "X-Content-Type-Options": "nosniff",
-                "X-Frame-Options": "DENY",
+                "Access-Control-Allow-Methods": "GET, POST"，
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"，
+                "X-Content-Type-Options": "nosniff"，
+                "X-Frame-Options": "DENY"，
                 "Referrer-Policy": "strict-origin-when-cross-origin"
               }
             });
           case "/logout":
-            return new Response("Success", {
-              status: 200,
+            return new Response("Success"， {
+              status: 200，
               headers: {
-                "Set-Cookie": "jwtToken=; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+                "Set-Cookie": "jwtToken=; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT"，
                 "Content-Type": "text/plain"
               }
             });
           case "/panel/password":
             const oldPwd = await env.bpb.get("pwd");
-            let passAuth = await Authenticate(request, env);
+            let passAuth = await Authenticate(request， env);
             if (oldPwd && !passAuth)
-              return new Response("Unauthorized!", { status: 401 });
+              return new Response("Unauthorized!"， { status: 401 });
             const newPwd = await request.text();
             if (newPwd === oldPwd)
-              return new Response("Please enter a new Password!", { status: 400 });
-            await env.bpb.put("pwd", newPwd);
-            return new Response("Success", {
-              status: 200,
+              return new Response("Please enter a new Password!"， { status: 400 });
+            await env.bpb.put("pwd"， newPwd);
+            return new Response("Success"， {
+              status: 200，
               headers: {
-                "Set-Cookie": "jwtToken=; Path=/; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+                "Set-Cookie": "jwtToken=; Path=/; Secure; SameSite=None; Expires=Thu, 01 Jan 1970 00:00:00 GMT"，
                 "Content-Type": "text/plain"
               }
             });
           default:
+            return new Response ('Not found'，{status: 404});
             url.hostname = "www.speedtest.net";
             url.protocol = "https:";
-            request = new Request(url, request);
+            request = new Request(url， request);
             return await fetch(request);
         }
       } else {
         return url.pathname.startsWith("/tr") ? await trojanOverWSHandler(request) : await vlessOverWSHandler(request);
       }
     } catch (err) {
-      const errorPage = renderErrorPage("Something went wrong!", err, false);
-      return new Response(errorPage, { status: 200, headers: { "Content-Type": "text/html" } });
+      const errorPage = renderErrorPage("Something went wrong!"， err， false);
+      return new Response(errorPage， { status: 200， headers: { "Content-Type": "text/html" } });
     }
   }
 };
@@ -4349,10 +4350,10 @@ async function vlessOverWSHandler(request) {
   let address = "";
   let portWithRandomLog = "";
   const log = (info, event) => {
-    console.log(`[${address}:${portWithRandomLog}] ${info}`, event || "");
+    console.log(`[${address}:${portWithRandomLog}] ${info}`， event || "");
   };
   const earlyDataHeader = request.headers.get("sec-websocket-protocol") || "";
-  const readableWebSocketStream = makeReadableWebSocketStream(webSocket, earlyDataHeader, log);
+  const readableWebSocketStream = makeReadableWebSocketStream(webSocket， earlyDataHeader， log);
   let remoteSocketWapper = {
     value: null
   };
